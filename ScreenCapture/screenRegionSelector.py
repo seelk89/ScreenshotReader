@@ -15,12 +15,12 @@ class ScreenRegionSelector(QMainWindow):
     BUTTON_NORMAL_COLOR = 'rgb(60, 90, 255)'
     BUTTON_HOVER_COLOR = 'rgb(60, 20, 255)'
 
-    def __init__(self, callback):
+    def __init__(self, queue):
         super().__init__(None)
         self.setWindowTitle('Screenshot Reader')
         self.setup_ui()
 
-        self.callback = callback
+        self.queue = queue
 
     def setup_ui(self):
         frame = QFrame()
@@ -60,6 +60,6 @@ class ScreenRegionSelector(QMainWindow):
         self.setCentralWidget(frame)
 
     def capture(self):
-        self.capturer = Capture(self, self.callback)
+        self.capturer = Capture(self, self.queue)
 
         self.capturer.show()

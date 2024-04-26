@@ -6,9 +6,7 @@ from PIL import Image
 import pytesseract
 import io
 
-pytesseract.pytesseract.tesseract_cmd = (
-    r'D:\Code\ScreenshotReader\Tesseract\tesseract.exe'
-)
+pytesseract.pytesseract.tesseract_cmd = r'.//Tesseract//tesseract.exe'
 
 
 class Capture(QWidget):
@@ -16,14 +14,14 @@ class Capture(QWidget):
     PNG_FORMAT = 'PNG'
     DEFAULT_LANGUAGE = 'eng'
 
-    def __init__(self, main_window, callback):
+    def __init__(self, main_window, queue):
         super().__init__()
         self.main = main_window
         # self.main.hide()
 
         self.setup_ui()
 
-        self.callback = callback
+        self.queue = queue
 
     def setup_ui(self):
         self.setMouseTracking(True)
@@ -92,7 +90,7 @@ class Capture(QWidget):
         et_without_dashes = et.replace('-\n', '')
         et_without_linebreaks = et_without_dashes.replace('\n', ' ')
 
-        self.callback(et_without_linebreaks)
+        self.queue.put(et_without_linebreaks)
 
     def pixmap_to_png(self, pixmap: QPixmap) -> QByteArray:
         buffer = QBuffer()
