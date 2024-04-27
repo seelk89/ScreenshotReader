@@ -6,6 +6,8 @@ from PIL import Image
 import pytesseract
 import io
 
+from LLM.chatGPTAPI import OpenaiApiGPT3Turbo
+
 pytesseract.pytesseract.tesseract_cmd = r'.//Tesseract//tesseract.exe'
 
 
@@ -17,7 +19,6 @@ class Capture(QWidget):
     def __init__(self, main_window, queue):
         super().__init__()
         self.main = main_window
-        # self.main.hide()
 
         self.setup_ui()
 
@@ -65,7 +66,16 @@ class Capture(QWidget):
 
             self.pixmap_to_string(cropped_image)
 
+            ciw = cropped_image.width()
+            cih = cropped_image.height()
+
+            self.main.resize(
+                ciw, cih
+            )  # Does not seem to work perfectly for resizing the frame to the image.
+
+            self.main.label.setFixedSize(ciw, cih)
             self.main.label.setPixmap(cropped_image)
+            self.main.label.setStyleSheet('border: 2px solid white;')
             self.main.show()
 
             QApplication.restoreOverrideCursor()
@@ -87,8 +97,15 @@ class Capture(QWidget):
 
         et = self.extract_text(png_data)
 
+        if self.main.summarize:
+            gpt = OpenaiApiGPT3Turbo()
+            et = gpt.get_summary(et)
+
         et_without_dashes = et.replace('-\n', '')
         et_without_linebreaks = et_without_dashes.replace('\n', ' ')
+
+        self.main.et = et_without_linebreaks
+        self.main.enable_button_btn_repeat()
 
         self.queue.put(et_without_linebreaks)
 

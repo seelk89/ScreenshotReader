@@ -19,5 +19,11 @@ if __name__ == '__main__':
     try:
         sys.exit(app.exec_())
     finally:
+        while not q.empty():
+            try:
+                q.get_nowait()
+            except queue.Empty:
+                break
+
         swr.stop()
         swr.join()

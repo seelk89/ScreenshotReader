@@ -9,16 +9,13 @@ class StringWatcherAndReader(threading.Thread):
         super().__init__()
         self.queue = queue
         self.stop_event = threading.Event()
-        self.previous_value = None
 
     def run(self):
         while not self.stop_event.is_set():
             value = self.queue.get()
 
-            if value is not None and value != self.previous_value:
-                self.previous_value = value
-                if isinstance(value, str):
-                    string_to_audio(value)
+            if value is not None and isinstance(value, str):
+                string_to_audio(value)
             time.sleep(1)  # Sleep for performance.
 
     def stop(self):
